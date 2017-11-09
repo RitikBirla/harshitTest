@@ -1,0 +1,209 @@
+Multi-Thread:
+program contains 2 or more parts that can be run concurrently and each part can handle a different task at the same time.
+
+Life-cycle:	    						
+Thread   ----> New ---start()----> Runnable ---run()---> Running ---sleep,wait()----->waiting
+														    |			      			|
+															|						   |	
+														end of execution              |
+															|	 				     |
+															|	--------------------|
+														   Dead	
+														   
+Priorities MIN_PRIORITY , MAX_PRIORITY and NORM_PRIORITY
+
+*Creating thread using Runnable Interface:
+Implement Runnable Interface to make class as thread class
+Step1 ---> implement run() method provided by Runnable Interface -> entry point for the thread and put the business logic inside this method.
+void run();
+Step 2 ----> need to instantiate the thread object using constructor:
+Thread(Runnable threadobj, String threadname);
+Step 3 ----> once thread object is created, start by calling start() method.
+void start();
+
+e.g
+class TestThread implements Runnable {
+   private Thread t;   // creating object of thread
+   private String threadName;
+   
+   TestThread( String name) {
+      threadName = name;
+      System.out.println("Creating " +  threadName );
+   }
+   
+   public void run() {   // implemented from runnable interface
+      
+	  //business logic
+      System.out.println("Running " +  threadName );
+      try {
+         for(int i = 4; i > 0; i--) {
+            System.out.println("Thread: " + threadName + ", " + i);
+            // Let the thread sleep for a while.
+            Thread.sleep(50);
+         }
+      }catch (InterruptedException e) {
+         System.out.println("Thread " +  threadName + " interrupted.");
+      }
+      System.out.println("Thread " +  threadName + " exiting.");
+   }
+   
+   public void start () {  //over-ride the start method for initialzing the thread object
+      System.out.println("Starting " +  threadName );
+      if (t == null) {
+         t = new Thread (this, threadName);
+         t.start ();
+      }
+   }
+}
+
+public class RunnableDemo {
+
+   public static void main(String args[]) {
+	   TestThread R1 = new TestThread( "Thread-1");
+      R1.start();
+      
+      TestThread R2 = new TestThread( "Thread-2");
+      R2.start();
+   }   
+}
+
+*Thread creation by extending Thread class
+class TestExtendThread extends Thread
+{
+	private Thread t;
+	private String threadName;
+	
+	TestExtendThread(String name)
+	{
+		this.threadName = name;
+	}
+	
+	public void run()
+	{
+		//business logic
+		System.out.println("thread "+this.threadName);
+	}
+	public void start()
+	{
+		if(t == null)
+		{
+			t = new Thread(this,threadName);
+			t.start();		
+		}
+	}
+}
+
+
+public class ExtendThread 
+{
+	public static void main(String args[])
+	{
+		TestExtendThread t1 = new TestExtendThread("Thread - 1");
+		t1.start();
+		TestExtendThread t2 = new TestExtendThread("Thread - 2");
+		t2.start();
+	}
+}
+
+methods: (these methods are invoked on particular thread object)
+1.public void start() - starts thread in a separate path and than invokes run() method.
+2.public void run() - to implementing business logic.
+3.public final void setName(String name) - changes the name of the thread and getName() will get the thread name.
+4.public final void setPriority(int priority) -Sets the priority of this Thread object. The possible values are between 1 and 10.
+5.public final void join(long millisec)-
+The current thread invokes this method on a second thread, causing the current thread to block until the second thread terminates or the specified number of milliseconds passes.
+6.public void interrupt()-
+Interrupts this thread, causing it to continue execution if it was blocked for any reason.
+
+Static Method (perform operations on the currently running thread)
+1.public static void yield()-
+Causes the currently running thread to yield to any other threads of the same priority that are waiting to be scheduled.
+
+2.public static void sleep(long millisec)-
+Causes the currently running thread to block for at least the specified number of milliseconds.
+
+3.public static boolean holdsLock(Object x)
+Returns true if the current thread holds the lock on the given Object.
+
+4.public static Thread currentThread()-
+Returns a reference to the currently running thread, which is the thread that invokes this method.
+
+**Synchronization of thread
+to avoid confusion.Only one thread access the resource at a given point in time.
+Implemented usign a concept of monitors.Each java object is associated with monitor, which a thread can lock or unlock.
+
+generalized syntax:
+synchronized(objectidentifier) {
+   // Access shared variables and other shared resources
+}
+
+e.g:
+class printDemo
+{
+	public void printNumber()
+	{
+		for(int i=1;i<=5;i++)
+		{
+			System.out.println("counter "+i);
+		}
+	}
+}
+class SynchThread extends Thread
+{
+	private Thread t;
+	private String threadName;
+	printDemo PD;
+	
+	SynchThread(String name,printDemo PD)
+	{
+		this.threadName = name;
+		this.PD = PD;
+	}
+	public void run()
+	{
+		synchronized (PD) {
+			PD.printNumber();
+		}
+		System.out.println("Exit thread "+this.threadName);
+	}
+	public void start()
+	{
+		if(t == null)
+		{
+			t = new Thread(this,threadName);
+			t.start();
+		}
+	}
+}
+public class SyncronizedThread 
+{
+	public static void main(String args[])
+	{
+		printDemo PD = new printDemo();
+		
+		SynchThread S1 = new SynchThread("Thread -1",PD);
+		S1.start();
+		SynchThread S2 = new SynchThread("Thread -2",PD);
+		S2.start();
+	}
+}
+
+InterThread communication: Important in application when 2 or more threads communicating with each other i.e exchanging information.
+methods:
+
+1.public void wait()-
+Causes the current thread to wait until another thread invokes the notify().
+
+2.public void notify()-
+Wakes up a single thread that is waiting on this object's monitor.
+
+3.public void notifyAll()-
+Wakes up all the threads that called wait( ) on the same object. highest priority will get monitor.
+
+*method are called from synchronized context.
+
+*Thread Class vs Runnable Interface
+
+1. If we extend the Thread class, our class cannot extend any other class because Java doesn’t support multiple inheritance. But, if we implement the Runnable interface, our class can still extend other base classes.
+
+2. We can achieve basic functionality of a thread by extending Thread class because it provides some inbuilt methods like yield(), interrupt() etc. that are not available in Runnable interface.
