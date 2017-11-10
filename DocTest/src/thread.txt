@@ -111,7 +111,8 @@ methods: (these methods are invoked on particular thread object)
 3.public final void setName(String name) - changes the name of the thread and getName() will get the thread name.
 4.public final void setPriority(int priority) -Sets the priority of this Thread object. The possible values are between 1 and 10.
 5.public final void join(long millisec)-
-The current thread invokes this method on a second thread, causing the current thread to block until the second thread terminates or the specified number of milliseconds passes.
+The current thread invokes this method on a second thread, causing the current thread to block until the second thread terminates or the 
+specified number of milliseconds passes.
 6.public void interrupt()-
 Interrupts this thread, causing it to continue execution if it was blocked for any reason.
 
@@ -204,6 +205,40 @@ Wakes up all the threads that called wait( ) on the same object. highest priorit
 
 *Thread Class vs Runnable Interface
 
-1. If we extend the Thread class, our class cannot extend any other class because Java doesn’t support multiple inheritance. But, if we implement the Runnable interface, our class can still extend other base classes.
+1. If we extend the Thread class, our class cannot extend any other class because Java doesn’t support multiple inheritance. 
+But, if we implement the Runnable interface, our class can still extend other base classes.
 
-2. We can achieve basic functionality of a thread by extending Thread class because it provides some inbuilt methods like yield(), interrupt() etc. that are not available in Runnable interface.
+2. We can achieve basic functionality of a thread by extending Thread class because it provides some inbuilt methods like yield(), 
+interrupt() etc. that are not available in Runnable interface.
+
+wait()																sleep()
+1)The wait() method is defined in Object class.		    The sleep() method is defined in Thread class.
+2)wait() method releases the lock.						The sleep() method doesn't releases the lock.
+
+*there is no possibility to start a thread twice. If we does, it throws an exception.
+Exception in thread "main" java.lang.IllegalThreadStateException
+
+*if we invoke run() method directly : than no exception it will be executed as normal object , no-context switching.
+whenever start() method is called a new call stack is created but if run() is called directly than new stack is not created and thread will 
+be executed in current call stack.
+
+*To make Thread as deamon Thread than thread should not be started otherwise it will throw exception<IllegalThreadStateException>
+
+*ThreadGroup in Java
+Java provides a convenient way to group multiple threads in a single object.
+1)	int activeCount()	returns no. of threads running in current group.
+2)	int activeGroupCount()	returns a no. of active group in this thread group.
+3)	void destroy()	destroys this thread group and all its sub groups.
+4)	String getName()	returns the name of this group.
+5)	ThreadGroup getParent()	returns the parent of this group.
+6)	void interrupt()	interrupts all threads of this group.
+7)	void list()	prints information of this group to standard console.
+
+ThreadGroup tg1 = new ThreadGroup("Group A");   
+Thread t1 = new Thread(tg1,new MyRunnable(),"one");     
+Thread t2 = new Thread(tg1,new MyRunnable(),"two");     
+Thread t3 = new Thread(tg1,new MyRunnable(),"three");    
+
+*Valid Constructor of thread
+Thread(Runnable r,String name)
+Thread()
