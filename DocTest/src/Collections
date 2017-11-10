@@ -1,0 +1,4 @@
+1.ArrayList collection class allows to grow or shrink its size and provides indexed access to its element but methods
+are not synchronized.
+Collections.unmodifiableXxxx() method with collections as an argument,which returns an immutable object of specific
+type.

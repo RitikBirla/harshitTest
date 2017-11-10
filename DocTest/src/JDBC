@@ -1,0 +1,248 @@
+JDBC Driver is a software component that enables java application to interact 
+with the database.
+There are 4 types of JDBC drivers:
+JDBC-ODBC bridge driver
+Native-API driver (partially java driver)
+Network Protocol driver (fully java driver)
+Thin driver (fully java driver)
+
+Step to Connect to DB
+Register the driver class :
+The forName() method of Class class is used to register the driver class.This method is used to dynamically load the driver class.
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+
+Create the connection object:
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","password");  
+
+Create the Statement object:
+Statement stmt=con.createStatement();  
+
+Execute the query:
+The executeQuery() method of Statement interface is used to execute queries to the database. This method returns the object of 
+ResultSet that can be used to get all the records of a table.
+
+ResultSet rs=stmt.executeQuery("select * from emp");  
+while(rs.next()){  
+System.out.println(rs.getInt(1)+" "+rs.getString(2));  
+}  
+
+Close the connection object:
+con.close();
+
+*DriverManager class
+The DriverManager class acts as an interface between user and drivers. 
+It keeps track of the drivers that are available and handles establishing a connection between a database and the appropriate driver. 
+The DriverManager class maintains a list of Driver classes that have registered themselves by calling the method DriverManager.registerDriver().
+
+1) public static void registerDriver(Driver driver):	is used to register the given driver with DriverManager.
+2) public static void deregisterDriver(Driver driver):	is used to deregister the given driver (drop the driver from the list) with DriverManager.
+3) public static Connection getConnection(String url):	is used to establish the connection with the specified url.
+4) public static Connection getConnection(String url,String userName,String password):	is used to establish the connection with the specified url, username and password. 
+
+*Connection Interface
+acts a session between java application and DB.
+Connection object provides object of Statement,PreparedStatement, and DatabaseMetaData.
+
+1) public Statement createStatement(): creates a statement object that can be used to execute SQL queries.
+2) public Statement createStatement(int resultSetType,int resultSetConcurrency): Creates a Statement object that will generate ResultSet objects with the given type and 
+   concurrency.
+3) public void setAutoCommit(boolean status): is used to set the commit status.By default it is true.
+4) public void commit(): saves the changes made since the previous commit/rollback permanent.
+5) public void rollback(): Drops all changes made since the previous commit/rollback.
+6) public void close(): closes the connection and Releases a JDBC resources immediately.
+
+*Statement interface
+The Statement interface provides methods to execute queries with the database.
+
+1) public ResultSet executeQuery(String sql): is used to execute SELECT query. It returns the object of ResultSet.
+2) public int executeUpdate(String sql): is used to execute specified query, it may be create, drop, insert, update, delete etc.
+3) public boolean execute(String sql): is used to execute queries that may return multiple results.
+4) public int[] executeBatch(): is used to execute batch of commands.
+
+*ResultSet:
+result i.e rows returned when we execute the query is maintained.
+its point to first row of a table.
+By default, ResultSet object can be moved forward only and it is not updatable.
+
+But we can make this object to move forward and backward direction by passing either TYPE_SCROLL_INSENSITIVE or TYPE_SCROLL_SENSITIVE in createStatement(int,int) 
+method as well as we can make this object as updatable by:
+
+Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);  
+
+1) public boolean next():	is used to move the cursor to the one row next from the current position.
+2) public boolean previous():	is used to move the cursor to the one row previous from the current position.
+3) public boolean first():	is used to move the cursor to the first row in result set object.
+4) public boolean last():	is used to move the cursor to the last row in result set object.
+5) public boolean absolute(int row):	is used to move the cursor to the specified row number in the ResultSet object.
+6) public boolean relative(int row):	is used to move the cursor to the relative row number in the ResultSet object, it may be positive or negative.
+7) public int getInt(int columnIndex):	is used to return the data of specified column index of the current row as int.
+8) public int getInt(String columnName):	is used to return the data of specified column name of the current row as int.
+9) public String getString(int columnIndex):	is used to return the data of specified column index of the current row as String.
+10) public String getString(String columnName):	is used to return the data of specified column name of the current row as String.
+
+*PreparedStatement interface
+The PreparedStatement interface is a sub-interface of Statement. It is used to execute parameterized query.
+
+The prepareStatement() method of Connection interface is used to return the object of PreparedStatement
+
+public void setInt(int paramIndex, int value)	sets the integer value to the given parameter index.
+public void setString(int paramIndex, String value)	sets the String value to the given parameter index.
+public void setFloat(int paramIndex, float value)	sets the float value to the given parameter index.
+public void setDouble(int paramIndex, double value)	sets the double value to the given parameter index.
+public int executeUpdate()	executes the query. It is used for create, drop, insert, update, delete etc.
+public ResultSet executeQuery()	executes the select query. It returns an instance of ResultSet.
+
+eample:
+Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+  
+PreparedStatement stmt=con.prepareStatement("insert into Emp values(?,?)");  
+stmt.setInt(1,101);//1 specifies the first parameter in the query  
+stmt.setString(2,"Ratan");  
+  
+int i=stmt.executeUpdate();  
+System.out.println(i+" records inserted");  
+  
+con.close();
+
+*ResultSetMetaData Interface
+ResultSetMetaData interface is useful because it provides methods to get metadata from the ResultSet object like total number of column, column name, column type etc.
+
+public int getColumnCount()throws SQLException	it returns the total number of columns in the ResultSet object.
+public String getColumnName(int index)throws SQLException	it returns the column name of the specified column index.
+public String getColumnTypeName(int index)throws SQLException	it returns the column type name for the specified index.
+public String getTableName(int index)throws SQLException	it returns the table name for the specified column index.
+
+The getMetaData() method of ResultSet interface returns the object of ResultSetMetaData
+
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+  
+PreparedStatement ps=con.prepareStatement("select * from emp");  
+ResultSet rs=ps.executeQuery();  
+ResultSetMetaData rsmd=rs.getMetaData();  
+  
+System.out.println("Total columns: "+rsmd.getColumnCount());  
+System.out.println("Column Name of 1st column: "+rsmd.getColumnName(1));  
+System.out.println("Column Type Name of 1st column: "+rsmd.getColumnTypeName(1));  
+  
+con.close();  
+
+*Stroing Image in DB
+setBinaryStream() method of PreparedStatement is used to set Binary information into the parameterIndex.
+
+1) public void setBinaryStream(int paramIndex,InputStream stream) throws SQLException  
+2) public void setBinaryStream(int paramIndex,InputStream stream,long length) throws SQLException  
+
+Image is stored in BLOB column of Table.
+
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+              
+PreparedStatement ps=con.prepareStatement("insert into imgtable values(?,?)");  
+ps.setString(1,"sonoo");  
+  
+FileInputStream fin=new FileInputStream("d:\\g.jpg");  
+ps.setBinaryStream(2,fin,fin.available());  
+int i=ps.executeUpdate();  
+System.out.println(i+" records affected");  
+          
+con.close();  
+
+*retrieve of image
+getBlob() method of ResultSet is used to get Binary information, it returns the instance of Blob. 
+After calling the getBytes() method on the blob object, we can get the array of binary information that can be written into the image file.
+
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+      
+PreparedStatement ps=con.prepareStatement("select * from imgtable");  
+ResultSet rs=ps.executeQuery();  
+if(rs.next()){//now on 1st row  
+              
+Blob b=rs.getBlob(2);//2 means 2nd column data  
+byte barr[]=b.getBytes(1,(int)b.length());//1 means first image  
+              
+FileOutputStream fout=new FileOutputStream("d:\\sonoo.jpg");  
+fout.write(barr);  
+              
+fout.close();  
+
+*Store file as CLOB
+example:
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+              
+PreparedStatement ps=con.prepareStatement("insert into filetable values(?,?)");  
+              
+File f=new File("d:\\myfile.txt");  
+FileReader fr=new FileReader(f);  
+              
+ps.setInt(1,101);  
+ps.setCharacterStream(2,fr,(int)f.length());  
+int i=ps.executeUpdate();  
+System.out.println(i+" records affected");  
+              
+con.close();  
+
+*Retrieve File
+
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+              
+PreparedStatement ps=con.prepareStatement("select * from filetable");  
+ResultSet rs=ps.executeQuery();  
+rs.next();//now on 1st row  
+              
+Clob c=rs.getClob(2);  
+Reader r=c.getCharacterStream();              
+              
+FileWriter fw=new FileWriter("d:\\retrivefile.txt");  
+              
+int i;  
+while((i=r.read())!=-1)  
+fw.write((char)i);  
+              
+fw.close();  
+
+*CallableStatement Interface : is used to call the stored procedures and functions.
+
+           Stored Procedure																		Function
+is used to perform business logic.													is used to perform calculation.
+must not have the return type.														must have the return type.
+may return 0 or more values.														may return only one values.
+We can call functions from the procedure.											Procedure cannot be called from function.
+Procedure supports input and output parameters.										Function supports only input parameter.
+Exception handling using try/catch block can be used in stored procedures.			Exception handling using try/catch can't be used in user defined functions.
+
+call procedure*
+
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+  
+CallableStatement stmt=con.prepareCall("{call insertR(?,?)}");  
+stmt.setInt(1,1011);  
+stmt.setString(2,"Amit");  
+stmt.execute();  
+  
+System.out.println("success");  
+
+*for calling functions
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+  
+CallableStatement stmt=con.prepareCall("{?= call sum4(?,?)}");  
+stmt.setInt(2,10);  
+stmt.setInt(3,43);  
+stmt.registerOutParameter(1,Types.INTEGER);  
+stmt.execute();  
+  
+System.out.println(stmt.getInt(1));  
+ 
