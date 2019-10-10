@@ -36,7 +36,7 @@ class TestThread implements Runnable
 
 public class RunnableDemo 
 {
-
+//class body started
 	public static void main(String args[])
 	{
 		TestThread T1 = new TestThread("Thread-1");
@@ -45,4 +45,5 @@ public class RunnableDemo
 		TestThread T2 = new TestThread("Thread-2");
 		T2.start();
 	}
+//classs body ended
 }
